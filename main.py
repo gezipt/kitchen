@@ -21,11 +21,15 @@ def make_connection():
     return conn
 
 
-# temperaturen vandaag
 def get_temperature(ruimte):
     conn = make_connection()
     sql = "select * from temperatuur where tijd > '"+str(dt.today())[0:10]+" 00:00:00';"
     df = pd.read_sql_query(sql, con = conn)[['tijd', ruimte]].set_index('tijd')
+    df['uur'] = df.index.floor('H')
+    df = df.set_index('uur')
+    df = df.groupby('uur').mean()
+    df['tijd'] = df.index
+
     return df
 
 def get_temperature_total():
@@ -33,7 +37,6 @@ def get_temperature_total():
     sql = "select * from temperatuur where tijd > '"+str(dt.today())[0:10]+" 00:00:00';"
     df = pd.read_sql_query(sql, con = conn)[['tijd', 'buiten', 'keuken', 'kamer']].set_index('tijd')
     return df
-
 
 
 # actuele temperatuur
@@ -46,7 +49,6 @@ def get_actual_temp(ruimte):
 
 st_autorefresh(interval=60 * 1000, key="dataframerefresh")
 
-#def main():
 buiten = get_temperature('buiten')
 kamer = get_temperature('kamer')
 keuken = get_temperature('keuken')
@@ -55,27 +57,32 @@ alles = get_temperature_total()
 alles = buiten.buiten.to_list()+keuken.keuken.to_list()+kamer.kamer.to_list()
 min_value = int(min(alles))
 max_value = round(max(alles), 0)
+
+
 with col1:
     st.write('Buiten')
     st.write(get_actual_temp('buiten'))
-    # chart = alt.Chart(buiten).mark_line().encode(
-    #     x='tijd:T',
-    #      y=alt.Y('buiten:Q'))
-    # st.altair_chart(chart)
-    st.line_chart(alles)
-    #alt.Chart(buiten).mark_line(color='black').encode()
+    line_buiten = alt.Chart(buiten).mark_line().encode(
+        x=alt.X('tijd'),
+        y=alt.Y('buiten', scale=alt.Scale(domain=[min_value, max_value]))
+    )
+
+    st.altair_chart(line_buiten)
 
 with col2:
     st.write('Keuken')
     st.write(get_actual_temp('keuken'))
-    st.line_chart(keuken)
+    line_keuken = alt.Chart(keuken).mark_line().encode(
+        x=alt.X('tijd'),
+        y=alt.Y('keuken', scale=alt.Scale(domain=[min_value, max_value]))
+    )
+    st.altair_chart(line_keuken)
+
 with col3:
     st.write('Kamer')
     st.write(get_actual_temp('kamer'))
-    st.line_chart(kamer)
-
-
-#if __name__ == "__main__":
-#    print('test2')
-#    print(host)
-#    main()
+    line_kamer = alt.Chart(kamer).mark_line().encode(
+        x=alt.X('tijd'),
+        y=alt.Y('kamer', scale=alt.Scale(domain=[min_value, max_value]))
+    )
+    st.altair_chart(line_kamer)

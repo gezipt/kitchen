@@ -74,6 +74,7 @@ semver==2.13.0
 Send2Trash==1.8.0
 six==1.16.0
 smmap==5.0.0
+solaredge==0.0.4
 soupsieve==2.3.1
 stack-data==0.2.0
 streamlit==1.8.1

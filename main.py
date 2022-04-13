@@ -11,8 +11,8 @@ import psycopg2
 import altair as alt
 import os
 import solaredge
-from dotenv import load_dotenv
-load_dotenv()
+#from dotenv import load_dotenv
+#load_dotenv()
 
 user = os.getenv('HAA_DB_USER')
 password = os.getenv('HAA_DB_PASSWORD')

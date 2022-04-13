@@ -120,7 +120,7 @@ with col2:
     area_rain = alt.Chart(rain_df).mark_area().encode(
         x=alt.X('tijd'),
         y=alt.Y('value')
-    )
+    ).properties(width=400)
     st.altair_chart(area_rain)
 
 
@@ -130,15 +130,15 @@ with col3:
     
     line_kamer = alt.Chart(kamer).mark_line().encode(
         x=alt.X('tijd'),
-        y=alt.Y('kamer', scale=alt.Scale(domain=[min_value, max_value], nice=False))
+        y=alt.Y('kamer', scale=alt.Scale(domain=[min_value, max_value]))
     )
     st.altair_chart(line_kamer)
 
     line_se = alt.Chart(se_df).mark_line().encode(
         x='hour',
         y='se_value',
-        color=alt.Color('day',scale=alt.Scale(range= ['#1f77b4', 'grey']))
-        )
+        color=alt.Color('day',scale=alt.Scale(range= ['#1f77b4', 'grey']), legend=None)
+        ).properties(width=400)
     st.altair_chart(line_se)
 
 

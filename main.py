@@ -1,5 +1,9 @@
+#TODO scale on rain values scale=alt.Scale(domain=[min_value, max_value])
+
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
+from buienradar.buienradar import (get_data, parse_data)
+from buienradar.constants import (CONTENT, RAINCONTENT, SUCCESS)
 from datetime import datetime as dt
 from datetime import date, timedelta
 import pandas as pd
@@ -15,6 +19,8 @@ password = os.getenv('HAA_DB_PASSWORD')
 host = os.getenv('HAA_DB_HOST')
 se_token = os.getenv('HAA_SOLAREDGE')
 se_site_id = os.getenv('HAA_SE_SITE_ID')
+lat = os.getenv('HAA_LAT')
+lon = os.getenv('HAA_LON')
 s = solaredge.Solaredge(se_token)
 
 st.set_page_config(layout="wide")
@@ -66,7 +72,7 @@ keuken = get_temperature('keuken')
 alles = get_temperature_total()
 alles = buiten.buiten.to_list()+keuken.keuken.to_list()+kamer.kamer.to_list()
 min_value = int(min(alles))
-max_value = round(max(alles), 0)
+max_value = round(max(alles), 0) + 2
 
 # solaredge
 yesterday = date.today() - timedelta(days=1)
@@ -87,12 +93,17 @@ se_df = pd.DataFrame({'se_date': se_date, 'se_value': se_value})
 se_df['day'] = se_df.se_date.str[0:10]
 se_df['hour'] = se_df.se_date.str[10:13]
 
+# rain data
+rain_url = 'https://gpsgadget.buienradar.nl/data/raintext/?lat='+str(lat)+'&lon='+str(lon)
+rain_df = pd.read_csv(rain_url, sep ='|', header=None, names = ['value', 'tijd'])
+
+# dashboard
 with col1:
     st.write('Buiten')
     st.write(get_actual_temp('buiten'))
     line_buiten = alt.Chart(buiten).mark_line().encode(
         x=alt.X('tijd'),
-        y=alt.Y('buiten', scale=alt.Scale(domain=[min_value, max_value]))
+        y=alt.Y('buiten', scale=alt.Scale(domain=[min_value, max_value], nice=False))
     )
 
     st.altair_chart(line_buiten)
@@ -102,9 +113,16 @@ with col2:
     st.write(get_actual_temp('keuken'))
     line_keuken = alt.Chart(keuken).mark_line().encode(
         x=alt.X('tijd'),
-        y=alt.Y('keuken', scale=alt.Scale(domain=[min_value, max_value]))
+        y=alt.Y('keuken', scale=alt.Scale(domain=[min_value, max_value], nice=False))
     )
     st.altair_chart(line_keuken)
+
+    area_rain = alt.Chart(rain_df).mark_area().encode(
+        x=alt.X('tijd'),
+        y=alt.Y('value')
+    )
+    st.altair_chart(area_rain)
+
 
 with col3:
     st.write('Kamer')
@@ -112,7 +130,7 @@ with col3:
     
     line_kamer = alt.Chart(kamer).mark_line().encode(
         x=alt.X('tijd'),
-        y=alt.Y('kamer', scale=alt.Scale(domain=[min_value, max_value]))
+        y=alt.Y('kamer', scale=alt.Scale(domain=[min_value, max_value], nice=False))
     )
     st.altair_chart(line_kamer)
 
@@ -122,6 +140,6 @@ with col3:
         color=alt.Color('day',scale=alt.Scale(range= ['#1f77b4', 'grey']))
         )
     st.altair_chart(line_se)
-    print(se_df)
+
 
 

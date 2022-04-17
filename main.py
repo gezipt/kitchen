@@ -19,9 +19,12 @@ password = os.getenv('HAA_DB_PASSWORD')
 host = os.getenv('HAA_DB_HOST')
 se_token = os.getenv('HAA_SOLAREDGE')
 se_site_id = os.getenv('HAA_SE_SITE_ID')
-lat = os.getenv('HAA_LAT')
-lon = os.getenv('HAA_LON')
+lat = float(os.getenv('HAA_LAT'))
+lon = float(os.getenv('HAA_LON'))
 s = solaredge.Solaredge(se_token)
+
+print(user)
+print(host)
 
 st.set_page_config(layout="wide")
 col1, col2, col3 = st.columns(3)
@@ -97,10 +100,27 @@ se_df['hour'] = se_df.se_date.str[10:13]
 rain_url = 'https://gpsgadget.buienradar.nl/data/raintext/?lat='+str(lat)+'&lon='+str(lon)
 rain_df = pd.read_csv(rain_url, sep ='|', header=None, names = ['value', 'tijd'])
 
+# buienradar overige info
+result = get_data(lat, lon)
+
+if result.get(SUCCESS):
+
+    data = result[CONTENT]
+    raindata = result[RAINCONTENT]
+
+
+    br = parse_data(data, raindata, lat, lon, 120)
+
+br_forecast_text = br['data']['forecast'][0]['condition']['exact_nl']
+br_min_temp = str(br['data']['forecast'][0]['mintemp'])
+br_max_temp = str(br['data']['forecast'][0]['maxtemp'])
+br_winddir = br['data']['forecast'][0]['winddirection']
+br_windspeed = str(br['data']['forecast'][0]['windspeed'])
+
 # dashboard
 with col1:
-    st.write('Buiten')
-    st.write(get_actual_temp('buiten'))
+    st.header('Buiten')
+    st.subheader(get_actual_temp('buiten'))
     line_buiten = alt.Chart(buiten).mark_line().encode(
         x=alt.X('tijd'),
         y=alt.Y('buiten', scale=alt.Scale(domain=[min_value, max_value], nice=False))
@@ -108,9 +128,13 @@ with col1:
 
     st.altair_chart(line_buiten)
 
+    st.subheader(br_forecast_text)
+    st.subheader('Temperatuur: '+br_min_temp+' - '+br_max_temp)
+    st.subheader('Wind: '+br_winddir+' '+br_windspeed+' km/h')
+
 with col2:
-    st.write('Keuken')
-    st.write(get_actual_temp('keuken'))
+    st.header('Keuken')
+    st.subheader(get_actual_temp('keuken'))
     line_keuken = alt.Chart(keuken).mark_line().encode(
         x=alt.X('tijd'),
         y=alt.Y('keuken', scale=alt.Scale(domain=[min_value, max_value], nice=False))
@@ -125,8 +149,8 @@ with col2:
 
 
 with col3:
-    st.write('Kamer')
-    st.write(get_actual_temp('kamer'))
+    st.header('Kamer')
+    st.subheader(get_actual_temp('kamer'))
     
     line_kamer = alt.Chart(kamer).mark_line().encode(
         x=alt.X('tijd'),

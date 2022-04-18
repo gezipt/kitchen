@@ -22,6 +22,7 @@ se_site_id = os.getenv('HAA_SE_SITE_ID')
 lat = float(os.getenv('HAA_LAT'))
 lon = float(os.getenv('HAA_LON'))
 s = solaredge.Solaredge(se_token)
+yesterday = date.today() - timedelta(days=1)
 
 print(user)
 print(host)
@@ -30,18 +31,35 @@ st.set_page_config(layout="wide")
 col1, col2, col3 = st.columns(3)
 
 def make_connection():
-    conn = psycopg2.connect(user=user, password=password, host=host, database='postgres', port=5432)
+    try:
+        conn = psycopg2.connect(user=user, password=password, host=host, database='postgres', port=5432)
+    except psycopg2.OperationalError:
+        pass
+    
     return conn
 
 
+# def get_temperature(ruimte):
+#     conn = make_connection()
+#     sql = "select * from temperatuur where tijd > '"+str(dt.today())[0:10]+" 00:00:00';"
+#     df = pd.read_sql_query(sql, con = conn)[['tijd', ruimte]].set_index('tijd')
+#     df['uur'] = df.index.floor('H')
+#     df = df.set_index('uur')
+#     df = df.groupby('uur').mean()
+#     df['tijd'] = df.index
+
+#     return df
+
 def get_temperature(ruimte):
     conn = make_connection()
-    sql = "select * from temperatuur where tijd > '"+str(dt.today())[0:10]+" 00:00:00';"
+    sql = "select * from temperatuur where tijd > '"+str(yesterday)+" 00:00:00';"
     df = pd.read_sql_query(sql, con = conn)[['tijd', ruimte]].set_index('tijd')
     df['uur'] = df.index.floor('H')
     df = df.set_index('uur')
     df = df.groupby('uur').mean()
     df['tijd'] = df.index
+    df['day'] = df.tijd.dt.strftime('%Y-%m-%d')
+    df['hour'] = df.tijd.dt.strftime('%H')
 
     return df
 
@@ -66,7 +84,7 @@ def get_energy(begin, end):
     
     return res
 
-st_autorefresh(interval=60 * 1000, key="dataframerefresh")
+st_autorefresh(interval=5*60*1000, key="dataframerefresh")
 
 # sensoren
 buiten = get_temperature('buiten')
@@ -78,7 +96,6 @@ min_value = int(min(alles))
 max_value = round(max(alles), 0) + 2
 
 # solaredge
-yesterday = date.today() - timedelta(days=1)
 se_energy = get_energy(str(yesterday)+" 00:00:00", str(dt.today())[0:10]+" 23:59:59")
 
 se_date = []
@@ -122,9 +139,10 @@ with col1:
     st.header('Buiten')
     st.subheader(get_actual_temp('buiten'))
     line_buiten = alt.Chart(buiten).mark_line().encode(
-        x=alt.X('tijd'),
-        y=alt.Y('buiten', scale=alt.Scale(domain=[min_value, max_value], nice=False))
-    )
+        x=alt.X('hour'),
+        y=alt.Y('buiten', scale=alt.Scale(domain=[min_value, max_value], nice=False)),
+        color=alt.Color('day',scale=alt.Scale(range= ['grey', '#1f77b4']), legend=None)
+    ).properties(width=400)
 
     st.altair_chart(line_buiten)
 
@@ -136,9 +154,10 @@ with col2:
     st.header('Keuken')
     st.subheader(get_actual_temp('keuken'))
     line_keuken = alt.Chart(keuken).mark_line().encode(
-        x=alt.X('tijd'),
-        y=alt.Y('keuken', scale=alt.Scale(domain=[min_value, max_value], nice=False))
-    )
+        x=alt.X('hour'),
+        y=alt.Y('keuken', scale=alt.Scale(domain=[min_value, max_value], nice=False)),
+        color=alt.Color('day',scale=alt.Scale(range= ['grey', '#1f77b4']), legend=None)
+    ).properties(width=400)
     st.altair_chart(line_keuken)
 
     area_rain = alt.Chart(rain_df).mark_area().encode(
@@ -153,15 +172,16 @@ with col3:
     st.subheader(get_actual_temp('kamer'))
     
     line_kamer = alt.Chart(kamer).mark_line().encode(
-        x=alt.X('tijd'),
-        y=alt.Y('kamer', scale=alt.Scale(domain=[min_value, max_value]))
-    )
+        x=alt.X('hour'),
+        y=alt.Y('kamer', scale=alt.Scale(domain=[min_value, max_value])),
+        color=alt.Color('day',scale=alt.Scale(range= ['grey', '#1f77b4']), legend=None)
+    ).properties(width=400)
     st.altair_chart(line_kamer)
 
     line_se = alt.Chart(se_df).mark_line().encode(
         x='hour',
         y='se_value',
-        color=alt.Color('day',scale=alt.Scale(range= ['#1f77b4', 'grey']), legend=None)
+        color=alt.Color('day',scale=alt.Scale(range= ['grey', '#1f77b4']), legend=None)
         ).properties(width=400)
     st.altair_chart(line_se)
 

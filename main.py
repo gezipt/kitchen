@@ -11,6 +11,7 @@ import psycopg2
 import altair as alt
 import os
 import solaredge
+import time
 #from dotenv import load_dotenv
 #load_dotenv()
 
@@ -31,12 +32,13 @@ st.set_page_config(layout="wide")
 col1, col2, col3 = st.columns(3)
 
 def make_connection():
-    try:
-        conn = psycopg2.connect(user=user, password=password, host=host, database='postgres', port=5432)
-    except psycopg2.OperationalError:
-        pass
-    
-    return conn
+    attempts = 0
+    while attempts < 5:
+        try:
+            conn = psycopg2.connect(user=user, password=password, host=host, database='postgres', port=5432)
+            return conn
+        except psycopg2.OperationalError:
+            attempt +=1
 
 
 # def get_temperature(ruimte):

@@ -12,6 +12,9 @@ import altair as alt
 import os
 import solaredge
 import time
+from urllib.request import urlopen
+import json
+
 #from dotenv import load_dotenv
 #load_dotenv()
 
@@ -24,9 +27,6 @@ lat = float(os.getenv('HAA_LAT'))
 lon = float(os.getenv('HAA_LON'))
 s = solaredge.Solaredge(se_token)
 yesterday = date.today() - timedelta(days=1)
-
-print(user)
-print(host)
 
 st.set_page_config(layout="wide")
 col1, col2, col3 = st.columns(3)
@@ -119,7 +119,7 @@ se_df['hour'] = se_df.se_date.str[10:13]
 rain_url = 'https://gpsgadget.buienradar.nl/data/raintext/?lat='+str(lat)+'&lon='+str(lon)
 rain_df = pd.read_csv(rain_url, sep ='|', header=None, names = ['value', 'tijd'])
 
-# buienradar overige info
+# # buienradar overige info
 result = get_data(lat, lon)
 
 if result.get(SUCCESS):
@@ -130,11 +130,23 @@ if result.get(SUCCESS):
 
     br = parse_data(data, raindata, lat, lon, 120)
 
-br_forecast_text = br['data']['forecast'][0]['condition']['exact_nl']
+response = urlopen('https://json.buienradar.nl')
+br_json = json.loads(response.read())
+
+#br_forecast_text = br['data']['forecast'][0]['condition']['exact_nl']
+# uit buienradar package
 br_min_temp = str(br['data']['forecast'][0]['mintemp'])
 br_max_temp = str(br['data']['forecast'][0]['maxtemp'])
-br_winddir = br['data']['forecast'][0]['winddirection']
-br_windspeed = str(br['data']['forecast'][0]['windspeed'])
+#br_winddir = br['data']['forecast'][0]['winddirection']
+br_winddir = br_json['actual']['stationmeasurements'][11]['winddirection']
+#br_windspeed = str(br['data']['forecast'][0]['windspeed'])
+br_windspeed = str(br_json['actual']['stationmeasurements'][11]['windspeed'])
+
+
+
+# rechtstreeks van json.buienradar.nl
+br_huidig = br_json['actual']['stationmeasurements'][11]['weatherdescription']
+br_sunset = br_json['actual']['sunset'][11:]
 
 # dashboard
 with col1:
@@ -148,9 +160,11 @@ with col1:
 
     st.altair_chart(line_buiten)
 
-    st.subheader(br_forecast_text)
+    #st.subheader(br_huidig)
+    st.image('https://www.buienradar.nl/resources/images/icons/weather/30x30/a.png')
     st.subheader('Temperatuur: '+br_min_temp+' - '+br_max_temp)
     st.subheader('Wind: '+br_winddir+' '+br_windspeed+' km/h')
+    st.subheader('Zon onder: '+br_sunset)
 
 with col2:
     st.header('Keuken')

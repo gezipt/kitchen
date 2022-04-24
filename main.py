@@ -14,6 +14,7 @@ import solaredge
 import time
 from urllib.request import urlopen
 import json
+import base64
 
 #from dotenv import load_dotenv
 #load_dotenv()
@@ -141,6 +142,7 @@ br_max_temp = str(br['data']['forecast'][0]['maxtemp'])
 br_winddir = br_json['actual']['stationmeasurements'][11]['winddirection']
 #br_windspeed = str(br['data']['forecast'][0]['windspeed'])
 br_windspeed = str(br_json['actual']['stationmeasurements'][11]['windspeed'])
+br_feeltemp = str(br_json['actual']['stationmeasurements'][11]['feeltemperature'])
 
 
 
@@ -148,10 +150,15 @@ br_windspeed = str(br_json['actual']['stationmeasurements'][11]['windspeed'])
 br_huidig = br_json['actual']['stationmeasurements'][11]['weatherdescription']
 br_sunset = br_json['actual']['sunset'][11:]
 
+
+
+
+
+
 # dashboard
 with col1:
     st.header('Buiten')
-    st.subheader(get_actual_temp('buiten'))
+    st.subheader(str(get_actual_temp('buiten'))+' (voelt als: '+br_feeltemp+')')
     line_buiten = alt.Chart(buiten).mark_line().encode(
         x=alt.X('hour'),
         y=alt.Y('buiten', scale=alt.Scale(domain=[min_value, max_value], nice=False)),

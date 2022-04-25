@@ -153,7 +153,7 @@ br_feeltemp = str(br_json['actual']['stationmeasurements'][11]['feeltemperature'
 # rechtstreeks van json.buienradar.nl
 br_huidig = br_json['actual']['stationmeasurements'][11]['weatherdescription']
 br_sunset = br_json['actual']['sunset'][11:]
-
+br_img = br_json['actual']['stationmeasurements'][11]['iconurl']
 
 
 
@@ -172,7 +172,7 @@ with col1:
     st.altair_chart(line_buiten)
 
     #st.subheader(br_huidig)
-    st.image('https://www.buienradar.nl/resources/images/icons/weather/30x30/a.png')
+    st.image(br_img)
     st.subheader('Temperatuur: '+br_min_temp+' - '+br_max_temp)
     st.subheader('Wind: '+br_winddir+' '+br_windspeed+' km/h')
     st.subheader('Zon onder: '+br_sunset)

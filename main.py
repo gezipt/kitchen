@@ -40,6 +40,10 @@ def make_connection():
             return conn
         except psycopg2.OperationalError:
             attempt +=1
+        except urllib.error.HTTPError:
+            attempt +=1
+        except UnboundLocalError:
+            attemp +=1
 
 
 # def get_temperature(ruimte):

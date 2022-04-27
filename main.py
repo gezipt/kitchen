@@ -91,6 +91,13 @@ def get_energy(begin, end):
     
     return res
 
+# events
+def get_events():
+    conn = make_connection()    
+    sql = "select * from events;"
+    df = pd.read_sql_query(sql, con = conn)[['date', 'type', 'name']]
+    return df
+
 st_autorefresh(interval=5*60*1000, key="dataframerefresh")
 
 # sensoren
@@ -149,12 +156,16 @@ br_windspeed = str(br_json['actual']['stationmeasurements'][11]['windspeed'])
 br_feeltemp = str(br_json['actual']['stationmeasurements'][11]['feeltemperature'])
 
 
-
 # rechtstreeks van json.buienradar.nl
 br_huidig = br_json['actual']['stationmeasurements'][11]['weatherdescription']
 br_sunset = br_json['actual']['sunset'][11:]
 br_img = br_json['actual']['stationmeasurements'][11]['iconurl']
 
+# events
+events = get_events()
+year = int(str(dt.today())[0:4])
+events['today'] = events['date'].mask(events['date'].dt.year < year, events['date'] + pd.offsets.DateOffset(year=year))
+todays_events = events[events.today == str(dt.today())[0:10]]
 
 
 
@@ -176,6 +187,8 @@ with col1:
     st.subheader('Temperatuur: '+br_min_temp+' - '+br_max_temp)
     st.subheader('Wind: '+br_winddir+' '+br_windspeed+' km/h')
     st.subheader('Zon onder: '+br_sunset)
+    if len(todays_events) == 1:
+        st.subheader(todays_events.type.iat[0] + ' ' + todays_events.name.iat[0])
 
 with col2:
     st.header('Keuken')

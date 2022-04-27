@@ -189,6 +189,7 @@ with col1:
     st.subheader('Zon onder: '+br_sunset)
     if len(todays_events) == 1:
         st.subheader(todays_events.type.iat[0] + ' ' + todays_events.name.iat[0])
+        st.balloons()
 
 with col2:
     st.header('Keuken')

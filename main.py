@@ -168,7 +168,7 @@ events['today'] = events['date'].mask(events['date'].dt.year < year, events['dat
 todays_events = events[events.today == str(dt.today())[0:10]]
 
 
-
+#1f77b4
 
 # dashboard
 with col1:
@@ -177,7 +177,7 @@ with col1:
     line_buiten = alt.Chart(buiten).mark_line().encode(
         x=alt.X('hour'),
         y=alt.Y('buiten', scale=alt.Scale(domain=[min_value, max_value], nice=False)),
-        color=alt.Color('day',scale=alt.Scale(range= ['grey', '#1f77b4']), legend=None)
+        color=alt.Color('day',scale=alt.Scale(range= ['grey', 'orange']), legend=None)
     ).properties(width=400)
 
     st.altair_chart(line_buiten)
@@ -196,7 +196,7 @@ with col2:
     line_keuken = alt.Chart(keuken).mark_line().encode(
         x=alt.X('hour'),
         y=alt.Y('keuken', scale=alt.Scale(domain=[min_value, max_value], nice=False)),
-        color=alt.Color('day',scale=alt.Scale(range= ['grey', '#1f77b4']), legend=None)
+        color=alt.Color('day',scale=alt.Scale(range= ['grey', 'orange']), legend=None)
     ).properties(width=400)
     st.altair_chart(line_keuken)
 
@@ -214,14 +214,14 @@ with col3:
     line_kamer = alt.Chart(kamer).mark_line().encode(
         x=alt.X('hour'),
         y=alt.Y('kamer', scale=alt.Scale(domain=[min_value, max_value])),
-        color=alt.Color('day',scale=alt.Scale(range= ['grey', '#1f77b4']), legend=None)
+        color=alt.Color('day',scale=alt.Scale(range= ['grey', 'orange']), legend=None)
     ).properties(width=400)
     st.altair_chart(line_kamer)
 
     line_se = alt.Chart(se_df).mark_line().encode(
         x='hour',
         y='se_value',
-        color=alt.Color('day',scale=alt.Scale(range= ['grey', '#1f77b4']), legend=None)
+        color=alt.Color('day',scale=alt.Scale(range= ['grey', 'orange']), legend=None)
         ).properties(width=400)
     st.altair_chart(line_se)
 

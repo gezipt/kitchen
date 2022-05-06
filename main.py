@@ -15,6 +15,14 @@ import time
 from urllib.request import urlopen
 import json
 import base64
+st.set_page_config(layout="wide")
+
+# css
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown('<style>{}</style>'.format(f.read()), unsafe_allow_html=True)
+
+local_css("style.css")
 
 #from dotenv import load_dotenv
 #load_dotenv()
@@ -29,7 +37,7 @@ lon = float(os.getenv('HAA_LON'))
 s = solaredge.Solaredge(se_token)
 yesterday = date.today() - timedelta(days=1)
 
-st.set_page_config(layout="wide")
+
 col1, col2, col3 = st.columns(3)
 
 def make_connection():
@@ -188,7 +196,10 @@ with col1:
     st.subheader('Wind: '+br_winddir+' '+br_windspeed+' km/h')
     st.subheader('Zon onder: '+br_sunset)
     if len(todays_events) == 1:
-        st.subheader(todays_events.type.iat[0] + ' ' + todays_events.name.iat[0])
+        years = str(int((todays_events.today - todays_events.date).dt.days//365))
+        event_text = text = todays_events.type.iat[0] + ' ' + todays_events.name.iat[0] + ' ('+years+' jaar)'
+        text = "<div><span class='highlight blue'>"+event_text+ "</span> </div>"
+        st.markdown(text, unsafe_allow_html=True)
         st.balloons()
 
 with col2:

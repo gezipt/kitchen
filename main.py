@@ -137,7 +137,7 @@ se_df['hour'] = se_df.se_date.str[10:13]
 
 # rain data
 rain_url = 'https://gpsgadget.buienradar.nl/data/raintext/?lat='+str(lat)+'&lon='+str(lon)
-rain_df = pd.read_csv(rain_url, sep ='|', header=None, names = ['value', 'tijd'])
+#rain_df = pd.read_csv(rain_url, sep ='|', header=None, names = ['value', 'tijd'])
 
 # # buienradar overige info
 result = get_data(lat, lon)
@@ -212,11 +212,11 @@ with col2:
     ).properties(width=400)
     st.altair_chart(line_keuken)
 
-    area_rain = alt.Chart(rain_df).mark_area().encode(
-        x=alt.X('tijd'),
-        y=alt.Y('value')
-    ).properties(width=400)
-    st.altair_chart(area_rain)
+    #area_rain = alt.Chart(rain_df).mark_area().encode(
+    #    x=alt.X('tijd'),
+    #    y=alt.Y('value')
+    #).properties(width=400)
+    #st.altair_chart(area_rain)
 
 
 with col3:

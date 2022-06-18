@@ -106,7 +106,7 @@ def get_events():
     df = pd.read_sql_query(sql, con = conn)[['date', 'type', 'name']]
     return df
 
-st_autorefresh(interval=5*60*1000, key="dataframerefresh")
+st_autorefresh(interval=10*60*1000, key="dataframerefresh")
 
 # sensoren
 buiten = get_temperature('buiten')

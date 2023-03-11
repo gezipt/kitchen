@@ -141,7 +141,7 @@ se_df['hour'] = se_df.se_date.str[10:13]
 try:
     rain_url = 'https://gpsgadget.buienradar.nl/data/raintext/?lat='+str(lat)+'&lon='+str(lon)
     rain_df = pd.read_csv(rain_url, sep ='|', header=None, names = ['value', 'tijd'])
-except HTTPError
+except HTTPError:
     rain_df = False
 
 # # buienradar overige info

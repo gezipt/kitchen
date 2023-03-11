@@ -154,9 +154,12 @@ if result.get(SUCCESS):
 
 
     br = parse_data(data, raindata, lat, lon, 120)
-
-response = urlopen('https://json.buienradar.nl')
-br_json = json.loads(response.read())
+try:
+    response = urlopen('https://json.buienradar.nl')
+    br_json = json.loads(response.read())
+except HTTPError:
+    br_json = False
+    
 
 #br_forecast_text = br['data']['forecast'][0]['condition']['exact_nl']
 # uit buienradar package
@@ -170,9 +173,14 @@ br_feeltemp = str(br_json['actual']['stationmeasurements'][11]['feeltemperature'
 
 
 # rechtstreeks van json.buienradar.nl
-br_huidig = br_json['actual']['stationmeasurements'][11]['weatherdescription']
-br_sunset = br_json['actual']['sunset'][11:]
-br_img = br_json['actual']['stationmeasurements'][11]['iconurl']
+if br_json:
+    br_huidig = br_json['actual']['stationmeasurements'][11]['weatherdescription']
+    br_sunset = br_json['actual']['sunset'][11:]
+    br_img = br_json['actual']['stationmeasurements'][11]['iconurl']
+else:
+    br_huidig = '?'
+    br_sunset = '?'
+    br_img = '?'
 
 # events
 events = get_events()

@@ -154,6 +154,10 @@ if result.get(SUCCESS):
 
 
     br = parse_data(data, raindata, lat, lon, 120)
+
+else:
+    br = False
+    
 try:
     response = urlopen('https://json.buienradar.nl')
     br_json = json.loads(response.read())
@@ -161,15 +165,20 @@ except HTTPError:
     br_json = False
     
 
-#br_forecast_text = br['data']['forecast'][0]['condition']['exact_nl']
+
 # uit buienradar package
-br_min_temp = str(br['data']['forecast'][0]['mintemp'])
-br_max_temp = str(br['data']['forecast'][0]['maxtemp'])
-#br_winddir = br['data']['forecast'][0]['winddirection']
-br_winddir = br_json['actual']['stationmeasurements'][11]['winddirection']
-#br_windspeed = str(br['data']['forecast'][0]['windspeed'])
-br_windspeed = str(br_json['actual']['stationmeasurements'][11]['windspeed'])
-br_feeltemp = str(br_json['actual']['stationmeasurements'][11]['feeltemperature'])
+if br == False:
+    br_min_temp = '?'
+    br_max_temp = '?'
+    br_winddir = '?'
+    br_windspeed = '?'
+    br_feeltemp = '?'
+else:
+    br_min_temp = str(br['data']['forecast'][0]['mintemp'])
+    br_max_temp = str(br['data']['forecast'][0]['maxtemp'])
+    br_winddir = br_json['actual']['stationmeasurements'][11]['winddirection']
+    br_windspeed = str(br_json['actual']['stationmeasurements'][11]['windspeed'])
+    br_feeltemp = str(br_json['actual']['stationmeasurements'][11]['feeltemperature'])
 
 
 # rechtstreeks van json.buienradar.nl

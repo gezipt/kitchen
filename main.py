@@ -212,8 +212,10 @@ with col1:
 
     st.altair_chart(line_buiten)
 
-    #st.subheader(br_huidig)
-    st.image(br_img)
+    if br_json:
+        st.image(br_img)
+    else:
+        st.subheader('?')
     st.subheader('Temperatuur: '+br_min_temp+' - '+br_max_temp)
     st.subheader('Wind: '+br_winddir+' '+br_windspeed+' km/h')
     st.subheader('Zon onder: '+br_sunset)

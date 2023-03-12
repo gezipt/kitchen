@@ -166,7 +166,6 @@ except HTTPError:
     br_json = False
     
 
-
 # uit buienradar package
 if br == False:
     br_min_temp = '?'
@@ -189,8 +188,8 @@ if br_json:
     br_sunset = br_json['actual']['sunset'][11:]
     br_img = br_json['actual']['stationmeasurements'][11]['iconurl']
 else:
-    br_huidig =  br_json_fallback['actual']['stationmeasurements'][11]['weatherdescription']
-    br_sunset = br_json_fallback['actual']['sunset'][11:]
+    br_huidig = 'kijk maar uit het raam'
+    br_sunset = 'merk je vanzelf'
     br_img = br_json_fallback['actual']['stationmeasurements'][11]['iconurl']
 
 # events
@@ -217,7 +216,8 @@ with col1:
     if br_json:
         st.image(br_img)
     else:
-        st.subheader('?')
+        st.image('https://icons.iconarchive.com/icons/famfamfam/mini/16/icon-alert-icon.png')
+        #st.subheader('?')
     st.subheader('Temperatuur: '+br_min_temp+' - '+br_max_temp)
     st.subheader('Wind: '+br_winddir+' '+br_windspeed+' km/h')
     st.subheader('Zon onder: '+br_sunset)

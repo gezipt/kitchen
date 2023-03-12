@@ -16,6 +16,7 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 import json
 import base64
+import requests
 st.set_page_config(layout="wide")
 
 # css
@@ -163,6 +164,7 @@ try:
     br_json = json.loads(response.read())
 except HTTPError:
     br_json = False
+    br_json_fallback = json.loads(requests.get('https://json.buienradar.nl').text)
     
 
 
@@ -170,9 +172,10 @@ except HTTPError:
 if br == False:
     br_min_temp = '?'
     br_max_temp = '?'
-    br_winddir = '?'
-    br_windspeed = '?'
-    br_feeltemp = '?'
+    br_winddir = br_json_fallback['actual']['stationmeasurements'][11]['winddirection']
+    br_windspeed = str(br_json_fallback['actual']['stationmeasurements'][11]['windspeed'])
+    br_feeltemp = str(br_json_fallback['actual']['stationmeasurements'][11]['feeltemperature'])
+
 else:
     br_min_temp = str(br['data']['forecast'][0]['mintemp'])
     br_max_temp = str(br['data']['forecast'][0]['maxtemp'])
@@ -187,9 +190,9 @@ if br_json:
     br_sunset = br_json['actual']['sunset'][11:]
     br_img = br_json['actual']['stationmeasurements'][11]['iconurl']
 else:
-    br_huidig = '?'
-    br_sunset = '?'
-    br_img = '?'
+    br_huidig =  br_json_fallback['actual']['stationmeasurements'][11]['weatherdescription']
+    br_sunset = br_json_fallback['actual']['sunset'][11:]
+    br_img = br_json_fallback['actual']['stationmeasurements'][11]['iconurl']
 
 # events
 events = get_events()

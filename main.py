@@ -190,7 +190,7 @@ if br_json:
 else:
     br_huidig = 'kijk maar uit het raam'
     br_sunset = 'merk je vanzelf'
-    br_img = br_json_fallback['actual']['stationmeasurements'][11]['iconurl']
+    br_img = '?'
 
 # events
 events = get_events()

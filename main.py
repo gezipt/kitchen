@@ -164,7 +164,6 @@ try:
     br_json = json.loads(response.read())
 except HTTPError:
     br_json = False
-    br_json_fallback = json.loads(requests.get('https://json.buienradar.nl').text)
     
 
 
@@ -172,9 +171,9 @@ except HTTPError:
 if br == False:
     br_min_temp = '?'
     br_max_temp = '?'
-    br_winddir = br_json_fallback['actual']['stationmeasurements'][11]['winddirection']
-    br_windspeed = str(br_json_fallback['actual']['stationmeasurements'][11]['windspeed'])
-    br_feeltemp = str(br_json_fallback['actual']['stationmeasurements'][11]['feeltemperature'])
+    br_winddir = '?'
+    br_windspeed = '?'
+    br_feeltemp = '?'
 
 else:
     br_min_temp = str(br['data']['forecast'][0]['mintemp'])

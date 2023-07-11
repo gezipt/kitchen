@@ -238,7 +238,7 @@ with col2:
     ).properties(width=400)
     st.altair_chart(line_keuken)
 
-    if rain_df:
+    if rain_df is not None:
         area_rain = alt.Chart(rain_df).mark_area().encode(
            x=alt.X('tijd'),
            y=alt.Y('value')

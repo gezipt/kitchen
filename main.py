@@ -244,7 +244,8 @@ with col2:
            y=alt.Y('value')
         ).properties(width=400)
         st.altair_chart(area_rain)
-    st.subheader('Buienradar niet beschikbaar')
+    else:
+        st.subheader('Buienradar niet beschikbaar')
 
 
 with col3:
